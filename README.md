@@ -3,4 +3,4 @@ This is an interactive scatter plot demonstrating COVID exporsure risk of differ
 It is made with Bokeh, Seaborn, numpy, and pandas.<br /> 
 Data from The Occupational Information Network.<br />
 
-![Plot Image](/my_app/COVIDplot.png)
+![Covid Risk Plot](/myapp/COVIDplot.png)
