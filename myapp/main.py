@@ -3,20 +3,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from bokeh.io import output_file, show, curdoc
-from bokeh.plotting import figure
+from bokeh.plotting import figure, save
 from bokeh.models import ColumnDataSource, Select, Div, HoverTool, Label, LabelSet, FixedTicker
 from bokeh.layouts import row, column
 from bokeh.models.renderers import GlyphRenderer
 from math import pi
+pd.options.mode.chained_assignment = None
 
 # Improt files
-expose = pd.read_csv(r'myapp/data/Exposed_to_Disease_or_Infections.csv',encoding='gbk')
+expose = pd.read_csv(r'data/Exposed_to_Disease_or_Infections.csv',encoding='gbk')
 #expose.shape (968,3)
 
-physical = pd.read_csv('myapp/data/Physical_Proximity.csv')
+physical = pd.read_csv('data/Physical_Proximity.csv')
 #physical.shape (967,3)
 
-TW_job = pd.read_excel('myapp/data/Small_Chinese.xlsx',encoding='utf-8')
+TW_job = pd.read_excel('data/Small_Chinese.xlsx')
 #TW_job.shape (968,3)
 TW_job = TW_job.iloc[:,:2]
 
@@ -35,7 +36,7 @@ full_table['Expose_frequency']=full_table['Expose_frequency'].astype('int64')
 # Start plotting 
 source = ColumnDataSource(full_table) 
 p = figure(title="各職業對新型冠狀病毒之風險", x_axis_label='工作時與人接近程度', y_axis_label='工作時暴露於疾病頻率',
-            plot_width=900, plot_height=600, sizing_mode='scale_both',active_drag=None)
+            width=900, height=600, sizing_mode = "scale_both",active_drag=None)
 p.circle('Physical_proximity','Expose_frequency',
             name = 'allcircle',
             size=10,fill_alpha=0.2, source=source, fill_color='gray', hover_fill_color='firebrick', hover_line_color="firebrick", line_color=None)
@@ -81,7 +82,7 @@ def filter_label(job):
     else:
         return ''
 
-color_table['label'] = color_table['Code'].apply(filter_label)
+color_table['label'] = color_table['Code'].map(filter_label)
 
 # Defining color 
 c_med = '#51A8DD'
@@ -102,7 +103,7 @@ def filter_color(job):
     else:
         return c_other
 
-color_table['color'] = color_table['label'].apply(filter_color)
+color_table['color'] = color_table['label'].map(filter_color)
 
 source_color = ColumnDataSource(color_table) 
 
@@ -173,7 +174,7 @@ div_help = Div(text="""
   <br></br> 橫軸表示工作者與人接觸的距離。縱軸表示工作者平時接觸到傳染疾病的頻率。滑鼠滑過該點可顯示其風險數值
   <br></br> 越右上角表示其接觸傳染病機率高和與人距離又近，所以我們可以看到醫療人員風險較高，另外像交通運輸業的空服員，教師族群，理髮師，消防，海關等也都是風險注意對象。
             風險也只能參考，低風險族群還是要做好防疫與衛生。
-   """,sizing_mode='scale_both', style={'font-size': '100%'} )
+   """,sizing_mode="scale_both" )
 
 div_reference = Div(text="""
 <ul>
@@ -181,10 +182,14 @@ div_reference = Div(text="""
   <li> 呈現參考 New York Times <a href="https://www.nytimes.com/interactive/2020/03/15/business/economy/coronavirus-worker-risk.html?smid=fb-nytimes&smtyp=cur&fbclid=IwAR0UG6dj1eqMilukx9wit5FX4P4TxAodtvW8b0toGyYDCKygM087uZr8P38">The Workers Who Face the Greatest Coronavirus Risk</a> by Lazaro Gamio  </li>
   <li> Author <a href="https://lastget.github.io/"> Richard Tsai </a></li>
 </ul>
-""", style={'font-size': '100%'})
+""")
 
 
 layout = column(p, select, div_help, div_reference)   
 
 # Add the plot to the current document
 curdoc().add_root(layout)  
+
+
+# save the results to a file
+show(p)
